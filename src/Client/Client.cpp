@@ -3,7 +3,9 @@
 //
 
 #include <Socket/Socket.h>
+
 #include <iostream>
+#include <cstring>
 
 int main() {
     Socket socket;

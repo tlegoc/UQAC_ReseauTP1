@@ -1,5 +1,6 @@
 set(SOCKET_SOURCES
-        Socket_common.cpp
+#        Socket_common.cpp
+        ""
 )
 
 if (WIN32)
@@ -19,6 +20,8 @@ add_library(
 
 if(WIN32)
     target_link_libraries(Socket wsock32 ws2_32)
+else()
+    target_link_libraries(Socket pthread)
 endif()
 
 target_include_directories(

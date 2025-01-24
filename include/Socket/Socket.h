@@ -28,9 +28,7 @@ public:
 
     static std::string GetLastErrorMessage();
 
-    struct SocketData;
-
 private:
     // Avoid making a virtual class by overriding this in cpp files
-    std::unique_ptr<SocketData> mSocketData = nullptr;
+    int mSocket = 0;
 };

@@ -55,8 +55,7 @@ Socket::Socket() {
         throw std::exception("Couldn't create socket: Winsock couldn't be initialized.");
     }
 
-    mSocketData = std::make_unique<SocketData>();
-    mSocketData->socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    mSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
     socketCount++;
 }
@@ -77,7 +76,7 @@ bool Socket::Bind(const std::string &port) {
     address.sin_port = htons(std::atoi(port.c_str()));
     address.sin_family = AF_INET;
 
-    if (bind(mSocketData->socket, reinterpret_cast<sockaddr *>(&address), sizeof(address)) == SOCKET_ERROR) {
+    if (bind(mSocket, reinterpret_cast<sockaddr *>(&address), sizeof(address)) == SOCKET_ERROR) {
         return false;
     }
 
@@ -92,7 +91,7 @@ bool Socket::Listen(Message &out, size_t maxSize) const {
     // Storage buffer
     char *buffer = new char[maxSize];
 
-    int byteRead = recvfrom(mSocketData->socket, buffer, maxSize, 0, reinterpret_cast<sockaddr *>(&address),
+    int byteRead = recvfrom(mSocket, buffer, maxSize, 0, reinterpret_cast<sockaddr *>(&address),
                             &addressSize);
     if (byteRead == SOCKET_ERROR) {
         return false;
@@ -120,7 +119,7 @@ bool Socket::Send(const std::string &address, const std::string &port, const std
     address_sa.sin_port = htons(std::atoi(port.c_str()));
     inet_pton(AF_INET, address.c_str(), &address_sa.sin_addr);
 
-    if (sendto(mSocketData->socket, message.data(), message.size(), 0, reinterpret_cast<sockaddr *>(&address_sa),
+    if (sendto(mSocket, message.data(), message.size(), 0, reinterpret_cast<sockaddr *>(&address_sa),
                sizeof(address_sa)) == SOCKET_ERROR) {
         return false;
     }
