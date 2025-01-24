@@ -46,10 +46,6 @@ void TryDeinitializeWinSock() {
     DeinitializeWinSock();
 }
 
-struct Socket::SocketData {
-    SOCKET socket = INVALID_SOCKET;
-};
-
 Socket::Socket() {
     if (!InitializeWinSock()) {
         throw std::exception("Couldn't create socket: Winsock couldn't be initialized.");
@@ -61,7 +57,7 @@ Socket::Socket() {
 }
 
 Socket::~Socket() {
-    closesocket(mSocketData->socket);
+    closesocket(mSocket);
 
     socketCount--;
 
