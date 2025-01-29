@@ -8,7 +8,7 @@
 #include <cstring>
 
 int main() {
-    Socket socket(SocketType::IPV6);
+    Socket socket(SocketType::IPV4);
 
     do {
         std::string text;
@@ -20,7 +20,7 @@ int main() {
 
         message = std::vector<char>(text.begin(), text.end());
 
-        socket.Send("::1", "5555", message);
+        socket.Send("127.0.0.1", "5555", message);
 
         Message returnMessage;
 

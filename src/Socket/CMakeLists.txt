@@ -1,5 +1,4 @@
 set(SOCKET_SOURCES
-#        Socket_common.cpp
         ""
 )
 
@@ -18,11 +17,11 @@ add_library(
         ${SOCKET_SOURCES}
 )
 
-if(WIN32)
+if (WIN32)
     target_link_libraries(Socket wsock32 ws2_32)
-else()
+else ()
     target_link_libraries(Socket pthread)
-endif()
+endif ()
 
 target_include_directories(
         Socket
