@@ -9,7 +9,7 @@
 #include <vector>
 
 struct Message {
-    std::vector<char> data;
+    std::vector<char> data; // TODO Change to span
     std::string address;
     std::string port;
 };
@@ -19,8 +19,13 @@ enum class SocketType {
     IPV4
 };
 
+// TODO Not use gigantic switch cases
+// Sidenote : why did we do this ?
+// Also should have either used defines
+
 class Socket {
 public:
+    // TODO Dont do this ?
     Socket(SocketType type = SocketType::IPV6);
 
     ~Socket();
@@ -29,12 +34,14 @@ public:
 
     bool Listen(Message &out, size_t maxSize = 1024) const;
 
+    // TODO Not const
+    // TODO Rename
     bool Send(const std::string &address, const std::string &port, const std::vector<char> &message) const;
 
     static std::string GetLastErrorMessage();
 
 private:
-    // Avoid making a virtual class by overriding this in cpp files
+    // TODO Change, this is trash
     int mSocket = 0;
     SocketType mSocketType;
 };

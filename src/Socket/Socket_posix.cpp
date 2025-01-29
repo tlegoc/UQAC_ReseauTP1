@@ -28,6 +28,7 @@ Socket::Socket(SocketType type) : mSocketType(type) {
 }
 
 Socket::~Socket() {
+    // TODO Socket validation check
     close(mSocket);
 }
 

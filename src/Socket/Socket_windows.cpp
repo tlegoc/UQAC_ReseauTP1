@@ -15,6 +15,8 @@
 #include <iostream>
 #include <sstream>
 
+
+// TODO Change shit initialisation, should use struct
 static bool bIsWinSockInitialized = false;
 static int socketCount = 0;
 
@@ -66,6 +68,7 @@ Socket::Socket(SocketType type) : mSocketType(type) {
 }
 
 Socket::~Socket() {
+    // TODO Socket validation check
     closesocket(mSocket);
 
     socketCount--;
