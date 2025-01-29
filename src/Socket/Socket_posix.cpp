@@ -13,8 +13,17 @@
 #include <sstream>
 #include <cstring>
 
-Socket::Socket() {
-    mSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+Socket::Socket(SocketType type) {
+    switch (type) {
+        case SocketType::IPV6: {
+            mSocket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+            break;
+        }
+        case SocketType::IPV4: {
+            mSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+            break;
+        }
+    }
 }
 
 Socket::~Socket() {
@@ -22,12 +31,12 @@ Socket::~Socket() {
 }
 
 bool Socket::Bind(const std::string &port) {
-    sockaddr_in address;
+    sockaddr_in6 address;
     std::memset(&address, 0, sizeof(address));
 
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(std::atoi(port.c_str()));
-    address.sin_family = AF_INET;
+    address.sin6_addr = in6addr_any;
+    address.sin6_port = htons(std::atoi(port.c_str()));
+    address.sin6_family = AF_INET6;
 
     int v60OnlyEnabled = 0;
     if (setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, (const char*) &v60OnlyEnabled, sizeof(v60OnlyEnabled)) != 0)
@@ -41,7 +50,7 @@ bool Socket::Bind(const std::string &port) {
 }
 
 bool Socket::Listen(Message &out, size_t maxSize) const {
-    sockaddr_in address;
+    sockaddr_in6 address;
     socklen_t addressSize = sizeof(address);
     std::memset(&address, 0, sizeof(addressSize));
 
@@ -57,10 +66,10 @@ bool Socket::Listen(Message &out, size_t maxSize) const {
     out.data.resize(byteRead);
     std::memcpy(out.data.data(), buffer, byteRead);
 
-    char strAddr[INET_ADDRSTRLEN];
-    inet_ntop(address.sin_family, &address.sin_addr, strAddr, INET_ADDRSTRLEN);
+    char strAddr[INET6_ADDRSTRLEN];
+    inet_ntop(address.sin6_family, &address.sin6_addr, strAddr, INET6_ADDRSTRLEN);
     out.address = strAddr;
-    out.port = std::to_string(ntohs(address.sin_port));
+    out.port = std::to_string(ntohs(address.sin6_port));
 
     delete[] buffer;
 
@@ -68,11 +77,11 @@ bool Socket::Listen(Message &out, size_t maxSize) const {
 }
 
 bool Socket::Send(const std::string &address, const std::string &port, const std::vector<char> &message) const {
-    sockaddr_in address_sa;
+    sockaddr_in6 address_sa;
     std::memset(&address_sa, 0, sizeof(address_sa));
-    address_sa.sin_family = AF_INET;
-    address_sa.sin_port = htons(std::atoi(port.c_str()));
-    inet_pton(AF_INET, address.c_str(), &address_sa.sin_addr);
+    address_sa.sin6_family = AF_INET6;
+    address_sa.sin6_port = htons(std::atoi(port.c_str()));
+    inet_pton(AF_INET6, address.c_str(), &address_sa.sin6_addr);
 
     if (sendto(mSocket, message.data(), message.size(), 0, reinterpret_cast<sockaddr *>(&address_sa), sizeof(address_sa)) == -1) {
         return false;
