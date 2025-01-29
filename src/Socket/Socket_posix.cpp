@@ -40,7 +40,7 @@ bool Socket::Bind(const std::string &port) {
             address.sin_family = AF_INET;
             address.sin_addr.s_addr = INADDR_ANY;
 
-            if (bind(mSocket, reinterpret_cast<sockaddr *>(&address), sizeof(address)) == SOCKET_ERROR) {
+            if (bind(mSocket, reinterpret_cast<sockaddr *>(&address), sizeof(address)) == -1) {
                 return false;
             }
             break;
@@ -58,7 +58,7 @@ bool Socket::Bind(const std::string &port) {
                 return false;
             }
 
-            if (bind(mSocket, reinterpret_cast<sockaddr *>(&address), sizeof(address)) == SOCKET_ERROR) {
+            if (bind(mSocket, reinterpret_cast<sockaddr *>(&address), sizeof(address)) == -1) {
                 return false;
             }
             break;
@@ -77,13 +77,12 @@ bool Socket::Listen(Message &out, size_t maxSize) const {
     switch (mSocketType) {
         case SocketType::IPV4: {
             sockaddr_in address;
-            int addressSize = sizeof(address);
+            socklen_t addressSize = sizeof(address);
             std::memset(&address, 0, sizeof(addressSize));
 
-            int byteRead = recvfrom(mSocket, buffer, maxSize, 0, reinterpret_cast<sockaddr *>(&address),
-                                    &addressSize);
+            int byteRead = recvfrom(mSocket, buffer, maxSize, 0, reinterpret_cast<sockaddr *>(&address), &addressSize);
 
-            if (byteRead == SOCKET_ERROR) {
+            if (byteRead == -1) {
                 return false;
             }
 
@@ -101,13 +100,12 @@ bool Socket::Listen(Message &out, size_t maxSize) const {
         }
         case SocketType::IPV6: {
             sockaddr_in6 address;
-            int addressSize = sizeof(address);
+            socklen_t addressSize = sizeof(address);
             std::memset(&address, 0, sizeof(addressSize));
 
-            int byteRead = recvfrom(mSocket, buffer, maxSize, 0, reinterpret_cast<sockaddr *>(&address),
-                                    &addressSize);
+            int byteRead = recvfrom(mSocket, buffer, maxSize, 0, reinterpret_cast<sockaddr *>(&address), &addressSize);
 
-            if (byteRead == SOCKET_ERROR) {
+            if (byteRead == -1) {
                 return false;
             }
 
@@ -140,7 +138,7 @@ bool Socket::Send(const std::string &address, const std::string &port, const std
             inet_pton(AF_INET, address.c_str(), &address_sa.sin_addr);
 
             if (sendto(mSocket, message.data(), message.size(), 0, reinterpret_cast<sockaddr *>(&address_sa),
-                       sizeof(address_sa)) == SOCKET_ERROR) {
+                       sizeof(address_sa)) == -1) {
                 return false;
             }
 
@@ -154,7 +152,7 @@ bool Socket::Send(const std::string &address, const std::string &port, const std
             inet_pton(AF_INET6, address.c_str(), &address_sa.sin6_addr);
 
             if (sendto(mSocket, message.data(), message.size(), 0, reinterpret_cast<sockaddr *>(&address_sa),
-                       sizeof(address_sa)) == SOCKET_ERROR) {
+                       sizeof(address_sa)) == -1) {
                 return false;
             }
 
@@ -169,7 +167,9 @@ bool Socket::Send(const std::string &address, const std::string &port, const std
 
 std::string Socket::GetLastErrorMessage() {
     std::stringstream ss;
-    ss << "Error " << ": ";
+    int err = errno;
+
+    ss << "Error " << err << ": " << strerror(err);
 
     return ss.str();
 }
