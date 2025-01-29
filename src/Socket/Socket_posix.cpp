@@ -29,6 +29,10 @@ bool Socket::Bind(const std::string &port) {
     address.sin_port = htons(std::atoi(port.c_str()));
     address.sin_family = AF_INET;
 
+    int v60OnlyEnabled = 0;
+    if (setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, (const char*) &v60OnlyEnabled, sizeof(v60OnlyEnabled)) != 0)
+        return false;
+
     if (bind(mSocket, reinterpret_cast<sockaddr *>(&address), sizeof(address)) == -1) {
         return false;
     }

@@ -14,9 +14,14 @@ struct Message {
     std::string port;
 };
 
+enum class SocketType {
+    IPV6,
+    IPV4
+};
+
 class Socket {
 public:
-    Socket();
+    Socket(SocketType type = SocketType::IPV6);
 
     ~Socket();
 
@@ -31,4 +36,5 @@ public:
 private:
     // Avoid making a virtual class by overriding this in cpp files
     int mSocket = 0;
+    SocketType mSocketType;
 };

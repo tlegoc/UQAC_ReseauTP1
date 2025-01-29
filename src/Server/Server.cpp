@@ -9,7 +9,7 @@
 
 int main()
 {
-    Socket socket;
+    Socket socket(SocketType::IPV6);
 
     if (!socket.Bind("5555"))
     {
